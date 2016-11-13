@@ -9,6 +9,7 @@ namespace BasicArithmetic
         private BigInteger modulus;
         private BigInteger value;
 
+        #region constructors, getters, setters
         public BigInteger Value
         {
             get
@@ -36,6 +37,7 @@ namespace BasicArithmetic
             value = (int)modular.value;
             modulus = modular.modulus;
         }
+        #endregion
 
         #region operators
         public static Modular operator +(Modular val1, Modular val2)
@@ -63,15 +65,21 @@ namespace BasicArithmetic
 
             var a = val1.value < 0 ? val1.AdditiveInversion() : val1;
             var b = val2.value < 0 ? val2.AdditiveInversion() : val2;
-
-            return new Modular((a.value + b.AdditiveInversion().value) % val1.modulus, val1.modulus);
+            var result = new Modular((a.value + b.AdditiveInversion().value) % val1.modulus, val1.modulus);
+            if (result < 0)
+                result = result.AdditiveInversion();
+            return result;
         }
 
         public static Modular operator -(Modular val1, int val2)
         {
             var a = val1.value < 0 ? val1.AdditiveInversion() : val1;
-
-            return new Modular((a.value + val2) % val1.modulus, val1.modulus);
+            var b = new Modular(val2, val1.Modulus);
+            b = b < 0 ? b.AdditiveInversion() : b;
+            var result = new Modular((a.value - val2) % val1.modulus, val1.modulus);
+            if (result < 0)
+                result = result.AdditiveInversion();
+            return result;
         }
 
         public static Modular operator *(Modular val1, Modular val2)
@@ -96,6 +104,18 @@ namespace BasicArithmetic
             Modular result = new Modular(val);
 
             for (int i = 0; i < power.value - 1; i++)
+                result *= val;
+
+            return result;
+        }
+
+        public static Modular operator ^(Modular val, BigInteger power)
+        {
+            var a = val.value < 0 ? val.AdditiveInversion() : val;
+
+            Modular result = new Modular(val);
+
+            for (int i = 0; i < power - 1; i++)
                 result *= val;
 
             return result;
@@ -138,19 +158,33 @@ namespace BasicArithmetic
 
             return !(a.value == val2);
         }
+
+        public static bool operator <(Modular val1, Modular val2)
+        {
+            return val1.value < val2.value;
+        }
+
+        public static bool operator >(Modular val1, Modular val2)
+        {
+            return val1.value > val2.value;
+        }
+
+        public static bool operator <(Modular val1, int val2)
+        {
+            return val1.value < val2;
+        }
+
+        public static bool operator >(Modular val1, int val2)
+        {
+            return val1.value > val2;
+        }
+
+        public static Modular operator ++(Modular val1)
+        {
+            val1.value++;
+            return val1;
+        }
         #endregion
-
-        public static string GetAdditiveGroupToString(BigInteger modulus)
-        {
-            var group = Modular.GetAdditiveGroup(modulus);
-            return Modular.GroupToString(group, modulus);
-        }
-
-        public static string GetMultiplicativeGroupToString(BigInteger modulus)
-        {
-            var group = Modular.GetMultiplicativeGroup(modulus);
-            return Modular.GroupToString(group, modulus);
-        }
 
         public string GetCyclicGroupToString()
         {
@@ -169,10 +203,39 @@ namespace BasicArithmetic
             return GetCyclicGroup().Count;
         }
 
-        public static int GetNumberOfPrimitives()
+        public string ModularToString()
         {
-            // Euler's function
-            throw new NotImplementedException();
+            return String.Format("{0} (mod{1})", value, modulus);
+        }
+
+        private List<Modular> GetCyclicGroup()
+        {
+            List<Modular> result = new List<Modular>();
+            Modular tmp = new Modular(this);
+            result.Add(tmp);
+
+            while (true)
+            {
+                tmp *= this;
+                result.Add(tmp);
+                if (tmp == 1)
+                    break;
+            }
+
+            return result;
+        }
+
+        public Modular AdditiveInversion()
+        {
+            return new Modular(modulus - BigInteger.Abs(value), modulus);
+        }
+
+        public Modular MultiplicativeInversion()
+        {
+            var eulersFunction = new Modular(Modular.EulersFunction(modulus), modulus);
+            var result = this ^ (eulersFunction - 1);
+
+            return result;
         }
 
         public override string ToString()
@@ -180,9 +243,37 @@ namespace BasicArithmetic
             return value.ToString();
         }
 
-        public string ModularToString()
+        #region static
+        public static string GetAdditiveGroupToString(BigInteger modulus)
         {
-            return String.Format("{0} (mod{1})", value, modulus);
+            var group = Modular.GetAdditiveGroup(modulus);
+            return Modular.GroupToString(group, modulus);
+        }
+
+        public static string GetMultiplicativeGroupToString(BigInteger modulus)
+        {
+            var group = Modular.GetMultiplicativeGroup(modulus);
+            return Modular.GroupToString(group, modulus);
+        }
+
+        public static BigInteger GetNumberOfPrimitives(BigInteger modulus)
+        {
+            // Euler's function
+            return Modular.EulersFunction(modulus);
+        }
+
+        public static List<Modular> GetPrimitives(BigInteger modulus)
+        {
+            List<Modular> primitives = new List<Modular>();
+
+            for (BigInteger i = 2; i < modulus - 1; i++)
+            {
+                Modular element = new Modular(i, modulus);
+                if (element.GetCyclicGroup().Count == modulus - 1)
+                    primitives.Add(element);
+            }
+
+            return primitives;
         }
 
         public static BigInteger EulersFunction(BigInteger modulus)
@@ -210,34 +301,41 @@ namespace BasicArithmetic
             return result;
         }
 
-        private List<Modular> GetCyclicGroup()
+        // TODO
+        public static List<BigInteger> FindAllDivisors(BigInteger number)
         {
-            List<Modular> result = new List<Modular>();
-            Modular tmp = new Modular(this);
-            result.Add(tmp);
+            List<BigInteger> divisors = new List<BigInteger>();
 
-            while (true)
+            for (BigInteger i = 2; i*i < number; i++)
             {
-                tmp *= this;
-                result.Add(tmp);
-                if (tmp == 1)
-                    break;
+                if (number % i == 0)
+                {
+                    divisors.Add(i);
+
+                    if (i != number / i)
+                        divisors.Add(number / i);
+                }
+            }
+            divisors.Sort();
+            return divisors;
+        }
+
+        // TODO
+        public static List<BigInteger> FindAllPrimeFactors(BigInteger modulus)
+        {
+            List<BigInteger> primeFactors = new List<BigInteger>();
+
+            for (BigInteger i = 1; i * i <= modulus; i++)
+            {
+                if ((modulus % i) == 0)
+                {
+                    if (!primeFactors.Contains(i))
+                        primeFactors.Add(i);
+                }
             }
 
-            return result;
-        }
-
-        private Modular AdditiveInversion()
-        {
-            return new Modular(modulus - BigInteger.Abs(value), modulus);
-        }
-
-        private Modular MultiplicativeInversion()
-        {
-            var eulersFunction = new Modular(Modular.EulersFunction(modulus), modulus);
-            var result = this ^ (eulersFunction - 1);
-
-            return result;
+            primeFactors.Sort();
+            return primeFactors;
         }
 
         private static BigInteger[,] GetAdditiveGroup(BigInteger modulus)
@@ -290,5 +388,6 @@ namespace BasicArithmetic
 
             return result;
         }
+        #endregion static
     }
 }
