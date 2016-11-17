@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace BasicArithmetic
 {
-    class Modular
+    public class Modular
     {
         private BigInteger modulus;
         private BigInteger value;
@@ -183,6 +183,14 @@ namespace BasicArithmetic
         {
             val1.value++;
             return val1;
+        }
+
+        public static Modular operator !(Modular val1)
+        {
+            var eulersFunction = new Modular(Modular.EulersFunction(val1.Modulus), val1.Modulus);
+            var result = val1 ^ (eulersFunction - 1);
+
+            return result;
         }
         #endregion
 
