@@ -299,7 +299,7 @@
             this.labelFieldSpecifier.Name = "labelFieldSpecifier";
             this.labelFieldSpecifier.Size = new System.Drawing.Size(33, 13);
             this.labelFieldSpecifier.TabIndex = 11;
-            this.labelFieldSpecifier.Text = "GF(2)";
+            this.labelFieldSpecifier.Text = "GF(?)";
             // 
             // panel5
             // 
@@ -352,6 +352,7 @@
             this.buttonAdditiveTable.TabIndex = 12;
             this.buttonAdditiveTable.Text = "Tabliczka dodawania";
             this.buttonAdditiveTable.UseVisualStyleBackColor = true;
+            this.buttonAdditiveTable.Click += new System.EventHandler(this.buttonAdditiveTable_Click);
             // 
             // buttonMultiplicativeTable
             // 
@@ -361,6 +362,7 @@
             this.buttonMultiplicativeTable.TabIndex = 13;
             this.buttonMultiplicativeTable.Text = "Tabliczka mnożenia";
             this.buttonMultiplicativeTable.UseVisualStyleBackColor = true;
+            this.buttonMultiplicativeTable.Click += new System.EventHandler(this.buttonMultiplicativeTable_Click);
             // 
             // buttonCountBasic
             // 

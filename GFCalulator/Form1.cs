@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using BasicArithmetic;
 using System.Numerics;
+using GFCalulator.Forms;
 
 namespace GFCalulator
 {
@@ -104,8 +105,33 @@ namespace GFCalulator
                 BigInteger basicBase;
                 var res = BigInteger.TryParse(textBoxBasicBase.Text, out basicBase);
                 if (res)
+                {
                     Base = basicBase;
+                    labelFieldSpecifier.Text = string.Format("GF({0})", Base);
+                }
             }
+        }
+
+        private void buttonAdditiveTable_Click(object sender, EventArgs e)
+        {
+            if (Base != 0)
+            {
+                GridForm form = new GridForm(Base, Modular.GetAdditiveGroup(Base), "Tabliczka dodawania nad " + labelFieldSpecifier.Text);
+                form.Show();
+            }
+            else
+                MessageBox.Show("Przed wygenerowaniem tabliczki dodawania wpisz podstawę ciała.");
+        }
+
+        private void buttonMultiplicativeTable_Click(object sender, EventArgs e)
+        {
+            if (Base != 0)
+            {
+                GridForm form = new GridForm(Base, Modular.GetMultiplicativeGroup(Base), "Tabliczka mnożenia nad " + labelFieldSpecifier.Text);
+                form.Show();
+            }
+            else
+                MessageBox.Show("Przed wygenerowaniem tabliczki mnożenia wpisz podstawę ciała.");
         }
     }
 }

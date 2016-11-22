@@ -54,6 +54,10 @@ namespace BasicArithmetic
             Coefficients = new Modular[polynomial.Coefficients.Length];
             for (int i = 0; i < polynomial.Coefficients.Length; i++)
                 Coefficients[i] = polynomial.Coefficients[i];
+            //var degree = PolynomialModular.Degree(polynomial);
+            //Coefficients = new Modular[degree + 1];
+            //for (int i = 0; i < degree + 1; i++)
+            //    Coefficients[i] = polynomial.Coefficients[i];
         }
 
         private void InitializeToZero(int length)
@@ -199,6 +203,16 @@ namespace BasicArithmetic
 
             return false;
         }
+
+        public static bool operator >(PolynomialModular a, PolynomialModular b)
+        {
+            return Degree(a) > Degree(b);
+        }
+
+        public static bool operator <(PolynomialModular a, PolynomialModular b)
+        {
+            return Degree(a) < Degree(b);
+        }
         #endregion
 
         private void Trim()
@@ -275,6 +289,28 @@ namespace BasicArithmetic
             }
 
             return result;
+        }
+
+        public static PolynomialModular Euclids(PolynomialModular a, PolynomialModular b)
+        {
+            if (PolynomialModular.IsZero(a))
+                return b;
+            if (PolynomialModular.IsZero(b))
+                return a;
+
+            if (a > b)
+                return Euclids(a % b, b);
+            else
+                return Euclids(a, b % a);
+        }
+
+        public static bool IsZero(PolynomialModular polynomial)
+        {
+            foreach (var coefficient in polynomial.Coefficients)
+                if (coefficient != 0)
+                    return false;
+
+            return true;
         }
 
         private static List<BigInteger> FindMinimalPolynomial(BigInteger characteristic, int extension, BigInteger index)

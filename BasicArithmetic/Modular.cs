@@ -346,7 +346,20 @@ namespace BasicArithmetic
             return primeFactors;
         }
 
-        private static BigInteger[,] GetAdditiveGroup(BigInteger modulus)
+        public static BigInteger Euclids(BigInteger a, BigInteger b)
+        {
+            if (a == 0)
+                return b;
+            if (b == 0)
+                return a;
+
+            if (a > b)
+                return Euclids(a % b, b);
+            else
+                return Euclids(a, b % a);
+        }
+
+        public static BigInteger[,] GetAdditiveGroup(BigInteger modulus)
         {
             var result = new BigInteger[(int)modulus, (int)modulus];
             for (int i = 0; i < modulus; i++)
@@ -362,7 +375,7 @@ namespace BasicArithmetic
             return result;
         }
 
-        private static BigInteger[,] GetMultiplicativeGroup(BigInteger modulus)
+        public static BigInteger[,] GetMultiplicativeGroup(BigInteger modulus)
         {
             BigInteger[,] result = new BigInteger[(int)modulus, (int)modulus];
             for (int i = 0; i < modulus; i++)

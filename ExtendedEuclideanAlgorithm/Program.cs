@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace KiS
 {
@@ -12,6 +13,27 @@ namespace KiS
         /// </summary>
         [STAThread]
         static void Main(string[] args)
+        {
+            BigInteger a = 36, b = 12;
+
+            Console.WriteLine(shortEuclids(a, b));
+            Console.ReadKey();
+        }
+
+        public static BigInteger shortEuclids(BigInteger a, BigInteger b)
+        {
+            if (a == 0)
+                return b;
+            if (b == 0)
+                return a;
+
+            if (a > b)
+                return shortEuclids(a % b, b);
+            else
+                return shortEuclids(a, b % a);
+        }
+
+        public static void longEuclids()
         {
             int r, a, q, b;
             int x, x1, x2;
@@ -72,8 +94,6 @@ namespace KiS
 
             if (nwd == 1)
                 Console.WriteLine(nwd_b + " * " + y + " mod " + nwd_a + " = 1");
-
-            Console.ReadKey();
         }
     }
 }

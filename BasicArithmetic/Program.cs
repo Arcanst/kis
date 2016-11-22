@@ -80,6 +80,9 @@ namespace BasicArithmetic
                 Console.WriteLine("Odwrotność multiplikatywna liczby {0} mod{1} = {2}", element, element.Modulus, element.MultiplicativeInversion());
             }
 
+            Console.WriteLine("Wynik Algorytmu Euklidesa dla {0} i {1}", number1, number2);
+            Console.WriteLine(Modular.Euclids(number1, number2));
+
             Console.WriteLine("------------------ POLYNOMIALS ------------------");
             PolynomialFieldRepresentation field1 = new PolynomialFieldRepresentation(2, 4, new BigInteger[] { 1, 1, 0, 0, 1 });
             PolynomialFieldRepresentation field2 = new PolynomialFieldRepresentation(3, 2);
@@ -120,6 +123,9 @@ namespace BasicArithmetic
             Console.WriteLine("Wielomiany nierozkładalne nad {0}:", field1);
             for (int i = 0; i < irreduciblePolynomials1.Count; i++)
                 Console.WriteLine("\t{0}", irreduciblePolynomials1[i]);
+
+            //Console.WriteLine("Algorytm Euklidesa dla wielomianów.");
+            //Console.WriteLine(PolynomialModular.Euclids(polynomial3, polynomial1));
 
             Console.ReadKey();
         }
