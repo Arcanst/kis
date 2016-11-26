@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Combinatorics.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -7,18 +8,18 @@ using System.Threading.Tasks;
 
 namespace BasicArithmetic
 {
-    class PolynomialModular : ExtendedModular
+    class Polynomial : ExtendedModular
     {
         private Modular[] Coefficients { get; set; }
 
         #region constructors and initializers
-        public PolynomialModular(PolynomialFieldRepresentation field, int length = 0)
+        public Polynomial(PolynomialFieldRepresentation field, int length = 0)
             : base(field) 
         {
             InitializeToZero(length != 0 ? length : field.Dimension + 1);
         }
 
-        public PolynomialModular(PolynomialFieldRepresentation field, int power, int length = 0)
+        public Polynomial(PolynomialFieldRepresentation field, int power, int length = 0)
             : base(field, power)
         {
             var generator = ((PolynomialFieldRepresentation)Field).Generator;
@@ -39,7 +40,7 @@ namespace BasicArithmetic
                     Coefficients[i] = rest[i];
         }
 
-        public PolynomialModular(PolynomialFieldRepresentation field, BigInteger[] coefficients)
+        public Polynomial(PolynomialFieldRepresentation field, BigInteger[] coefficients)
             :base(field)
         {
             Coefficients = new Modular[coefficients.Length];
@@ -48,7 +49,7 @@ namespace BasicArithmetic
                 Coefficients[i] = new Modular(coefficients[i], Field.Characteristic);
         }
 
-        public PolynomialModular(PolynomialModular polynomial)
+        public Polynomial(Polynomial polynomial)
             : base(polynomial.Field)
         {
             Coefficients = new Modular[polynomial.Coefficients.Length];
@@ -67,31 +68,31 @@ namespace BasicArithmetic
                 Coefficients[i] = new Modular(0, Field.Characteristic);
         }
 
-        private static bool CheckCharacteristicAndExtension(PolynomialModular a, PolynomialModular b)
+        private static bool CheckCharacteristicAndExtension(Polynomial a, Polynomial b)
         {
             return (a.Field.Characteristic == b.Field.Characteristic) && (a.Field.Dimension == b.Field.Dimension);
         }
         #endregion
 
         #region operators
-        public static PolynomialModular operator +(PolynomialModular a, PolynomialModular b)
+        public static Polynomial operator +(Polynomial a, Polynomial b)
         {
-            if (!PolynomialModular.CheckCharacteristicAndExtension(a, b))
+            if (!Polynomial.CheckCharacteristicAndExtension(a, b))
                 throw new DifferentFieldsException("Both polynomials have to be over same field.");
 
-            PolynomialModular result = new PolynomialModular((PolynomialFieldRepresentation)a.Field, length: Math.Max(a.Coefficients.Length, b.Coefficients.Length));
+            Polynomial result = new Polynomial((PolynomialFieldRepresentation)a.Field, length: Math.Max(a.Coefficients.Length, b.Coefficients.Length));
             for (int i = 0; i < a.Field.Dimension; i++)
                 result[i] = a[i] + b[i];
 
             return result;
         }
 
-        public static PolynomialModular operator -(PolynomialModular a, PolynomialModular b)
+        public static Polynomial operator -(Polynomial a, Polynomial b)
         {
-            if (!PolynomialModular.CheckCharacteristicAndExtension(a, b))
+            if (!Polynomial.CheckCharacteristicAndExtension(a, b))
                 throw new DifferentFieldsException("Both polynomials have to be over same field.");
             int i;
-            PolynomialModular result = new PolynomialModular((PolynomialFieldRepresentation)a.Field, length: Math.Max(a.Coefficients.Length, b.Coefficients.Length));
+            Polynomial result = new Polynomial((PolynomialFieldRepresentation)a.Field, length: Math.Max(a.Coefficients.Length, b.Coefficients.Length));
             for (i = 0; i < Math.Min(a.Coefficients.Length, b.Coefficients.Length); i++)
             {
                 if (a[i] < 0)
@@ -119,12 +120,12 @@ namespace BasicArithmetic
             return result;
         }
 
-        public static PolynomialModular operator *(PolynomialModular a, PolynomialModular b)
+        public static Polynomial operator *(Polynomial a, Polynomial b)
         {
-            if (!PolynomialModular.CheckCharacteristicAndExtension(a, b))
+            if (!Polynomial.CheckCharacteristicAndExtension(a, b))
                 throw new DifferentFieldsException("Both polynomials have to be over same field.");
 
-            PolynomialModular product = new PolynomialModular((PolynomialFieldRepresentation)a.Field, length: 2 * a.Field.Dimension + 1);
+            Polynomial product = new Polynomial((PolynomialFieldRepresentation)a.Field, length: 2 * a.Field.Dimension + 1);
             
             for (int i = 0; i < a.Field.Dimension; i++)
                 for (int j = 0; j < a.Field.Dimension; j++)
@@ -136,19 +137,19 @@ namespace BasicArithmetic
             return result;
         }
 
-        public static PolynomialModular operator %(PolynomialModular a, PolynomialModular b)
+        public static Polynomial operator %(Polynomial a, Polynomial b)
         {
             int degree = Degree(a);
             int divisorDegree = Degree(b);
             if (degree < divisorDegree)
-                return new PolynomialModular(a);
+                return new Polynomial(a);
 
-            PolynomialModular result = new PolynomialModular((PolynomialFieldRepresentation)a.Field, length: degree - divisorDegree + 1);
-            PolynomialModular rest = new PolynomialModular(a);
+            Polynomial result = new Polynomial((PolynomialFieldRepresentation)a.Field, length: degree - divisorDegree + 1);
+            Polynomial rest = new Polynomial(a);
 
             while (Degree(rest) >= divisorDegree)
             {
-                PolynomialModular temp = new PolynomialModular((PolynomialFieldRepresentation)a.Field, length: degree + 1);
+                Polynomial temp = new Polynomial((PolynomialFieldRepresentation)a.Field, length: degree + 1);
                 int elementDegree = degree - divisorDegree;
                 result[elementDegree] = rest[degree] * b[divisorDegree].MultiplicativeInversion();
 
@@ -162,7 +163,7 @@ namespace BasicArithmetic
             return rest;
         }
 
-        public static bool operator ==(PolynomialModular a, PolynomialModular b)
+        public static bool operator ==(Polynomial a, Polynomial b)
         {
             if (ReferenceEquals(a, b))
                 return true;
@@ -184,7 +185,7 @@ namespace BasicArithmetic
             return true;
         }
 
-        public static bool operator !=(PolynomialModular a, PolynomialModular b)
+        public static bool operator !=(Polynomial a, Polynomial b)
         {
             if (ReferenceEquals(a, b))
                 return false;
@@ -204,32 +205,14 @@ namespace BasicArithmetic
             return false;
         }
 
-        public static bool operator >(PolynomialModular a, PolynomialModular b)
+        public static bool operator >(Polynomial a, Polynomial b)
         {
             return Degree(a) > Degree(b);
         }
 
-        public static bool operator <(PolynomialModular a, PolynomialModular b)
+        public static bool operator <(Polynomial a, Polynomial b)
         {
             return Degree(a) < Degree(b);
-        }
-        #endregion
-
-        private void Trim()
-        {
-            var coefficients = Coefficients;
-            Coefficients = new Modular[Field.Dimension];
-            for (int i = 0; i < Field.Dimension; i++)
-                Coefficients[i] = coefficients[i];
-        }
-
-        private static int Degree(PolynomialModular polynomial)
-        {
-            for (int i = polynomial.Coefficients.Count() - 1; i >= 0; i--)
-                if (polynomial[i] != 0)
-                    return i;
-
-            return -1;
         }
 
         public Modular this[int key]
@@ -243,21 +226,51 @@ namespace BasicArithmetic
                 Coefficients[key] = value;
             }
         }
+        #endregion
 
-        public static List<PolynomialModular> FindIrreduciblePolynomials(PolynomialFieldRepresentation field)
+        private void Trim()
         {
-            List<PolynomialModular> result = new List<PolynomialModular>();
-            var one = new PolynomialModular(field, power: 1);
+            var coefficients = Coefficients;
+            Coefficients = new Modular[Field.Dimension];
+            for (int i = 0; i < Field.Dimension; i++)
+                Coefficients[i] = coefficients[i];
+        }
 
-            var minimalPolynomials = PolynomialModular.FindMinimalPolynomials(field.Characteristic, field.Dimension);
+        public Modular CalculateForArgument(Modular argument)
+        {
+            BigInteger value = 0;
+
+            for (int i = 0; i < this.Coefficients.Length; i++)
+                value += this.Coefficients[i].Value * BigInteger.Pow(argument.Value, i);
+            Modular result = new Modular(value, this.Field.Characteristic, false);
+
+            return result;
+        }
+
+        #region static
+        private static int Degree(Polynomial polynomial)
+        {
+            for (int i = polynomial.Coefficients.Count() - 1; i >= 0; i--)
+                if (polynomial[i] != 0)
+                    return i;
+
+            return -1;
+        }
+
+        public static List<Polynomial> FindIrreduciblePolynomials2(PolynomialFieldRepresentation field)
+        {
+            List<Polynomial> result = new List<Polynomial>();
+            var one = new Polynomial(field, power: 1);
+
+            var minimalPolynomials = Polynomial.FindMinimalPolynomials(field.Characteristic, field.Dimension);
 
             foreach (var minimalPolynomial in minimalPolynomials)
             {
-                List<PolynomialModular> elements = new List<PolynomialModular>();
+                List<Polynomial> elements = new List<Polynomial>();
                 foreach (var element in minimalPolynomial)
-                    elements.Add(new PolynomialModular(field, power: (int)element));
+                    elements.Add(new Polynomial(field, power: (int)element));
 
-                PolynomialModular irreduciblePolynomial = elements[0] - one;
+                Polynomial irreduciblePolynomial = elements[0] - one;
                 for (int i = 1; i < elements.Count; i++)
                 {
                     var par = elements[i] - one;
@@ -265,6 +278,24 @@ namespace BasicArithmetic
                 }
 
                 result.Add(irreduciblePolynomial);
+            }
+
+            return result;
+        }
+
+        public static List<Polynomial> FindIrreduciblePolynomials(PolynomialFieldRepresentation field)
+        {
+            List<Polynomial> result = new List<Polynomial>();
+            var elements = Modular.GetAllElements(field.Characteristic);
+            var variations = new Variations<BigInteger>(elements, field.Dimension + 1, GenerateOption.WithRepetition);
+
+            foreach (var variation in variations)
+            {
+                if (variation[field.Dimension] == 0)
+                    continue;
+                Polynomial polynomial = new Polynomial(field, variation.ToArray());
+                if (polynomial.CalculateForArgument(new Modular(field.Characteristic, field.Characteristic, false)).IsPrime())
+                    result.Add(polynomial);
             }
 
             return result;
@@ -283,7 +314,7 @@ namespace BasicArithmetic
                     i++;
                     continue;
                 }
-                var minimalPolynomial = PolynomialModular.FindMinimalPolynomial(characteristic, extension, i);
+                var minimalPolynomial = Polynomial.FindMinimalPolynomial(characteristic, extension, i);
                 elements.AddRange(minimalPolynomial);
                 result.Add(minimalPolynomial);
             }
@@ -291,11 +322,11 @@ namespace BasicArithmetic
             return result;
         }
 
-        public static PolynomialModular Euclids(PolynomialModular a, PolynomialModular b)
+        public static Polynomial Euclids(Polynomial a, Polynomial b)
         {
-            if (PolynomialModular.IsZero(a))
+            if (Polynomial.IsZero(a))
                 return b;
-            if (PolynomialModular.IsZero(b))
+            if (Polynomial.IsZero(b))
                 return a;
 
             if (a > b)
@@ -304,7 +335,7 @@ namespace BasicArithmetic
                 return Euclids(a, b % a);
         }
 
-        public static bool IsZero(PolynomialModular polynomial)
+        public static bool IsZero(Polynomial polynomial)
         {
             foreach (var coefficient in polynomial.Coefficients)
                 if (coefficient != 0)
@@ -326,6 +357,7 @@ namespace BasicArithmetic
 
             return result;
         }
+        #endregion
 
         public override string ToString()
         {

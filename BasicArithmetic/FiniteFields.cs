@@ -19,7 +19,7 @@ namespace BasicArithmetic
 
     class PolynomialFieldRepresentation : ExtendedFiniteField
     {
-        public PolynomialModular Generator { get; set; }
+        public Polynomial Generator { get; set; }
 
         public PolynomialFieldRepresentation(BigInteger characteristic, int dimension)
         {
@@ -31,7 +31,7 @@ namespace BasicArithmetic
         {
             Characteristic = characteristic;
             Dimension = dimension;
-            Generator = new PolynomialModular(this, generator);
+            Generator = new Polynomial(this, generator);
         }
 
         public static bool operator ==(PolynomialFieldRepresentation field1, PolynomialFieldRepresentation field2)

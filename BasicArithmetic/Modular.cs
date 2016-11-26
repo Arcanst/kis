@@ -26,16 +26,16 @@ namespace BasicArithmetic
             }
         }
 
-        public Modular(BigInteger value, BigInteger modulus)
+        public Modular(BigInteger value, BigInteger modulus, bool convert = true)
         {
             this.modulus = modulus;
-            this.value = (int)value % this.modulus;
+            this.value = convert ? value % this.modulus : value;
         }
 
-        public Modular(Modular modular)
+        public Modular(Modular modular, bool convert = true)
         {
-            value = (int)modular.value;
-            modulus = modular.modulus;
+            this.modulus = modular.modulus;
+            this.value = convert ? modular.Value % this.modulus : modular.Value;
         }
         #endregion
 
@@ -204,6 +204,18 @@ namespace BasicArithmetic
         public bool IsPrimary()
         {
             return GetCyclicGroup().Count == modulus - 1;
+        }
+
+        public bool IsPrime()
+        {
+            if (this.value < 2)
+                return false;
+
+            for (BigInteger i = 2; i < this.value; i++)
+                if (this.value % i == 0)
+                    return false;
+
+            return true;
         }
 
         public int GetOrder()
@@ -406,6 +418,16 @@ namespace BasicArithmetic
                         result += "\n";
                 }
             }
+
+            return result;
+        }
+
+        public static List<BigInteger> GetAllElements(BigInteger modulus)
+        {
+            List<BigInteger> result = new List<BigInteger>();
+
+            for (BigInteger i = 0; i < modulus; i++)
+                result.Add(i);
 
             return result;
         }

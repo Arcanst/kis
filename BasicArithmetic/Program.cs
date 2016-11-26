@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
+using Combinatorics;
+using Combinatorics.Collections;
 
 namespace BasicArithmetic
 {
@@ -15,6 +19,8 @@ namespace BasicArithmetic
             Modular c = new Modular(4, 7);
             Modular d = new Modular(-5, 7);
             Modular e = new Modular(-3, 7);
+            Modular f = new Modular(2, 2, false);
+
             int modulus = 11, maxModulus = 21;
 
             var res1 = a + b;
@@ -33,9 +39,7 @@ namespace BasicArithmetic
             BigInteger number1 = 100;
             BigInteger number2 = 11;
 
-            var divisors1 = Modular.FindAllDivisors(number1);
             var primitives1 = Modular.GetPrimitives(number2);
-            var primeFactors1 = Modular.FindAllPrimeFactors(number1);
 
             Console.WriteLine("{0} + {1} = {2}\t{3}", a, b, res1, 0);
             Console.WriteLine("{0} + {1} = {2}\t{3}", c, a, res2, 2);
@@ -87,45 +91,50 @@ namespace BasicArithmetic
             PolynomialFieldRepresentation field1 = new PolynomialFieldRepresentation(2, 4, new BigInteger[] { 1, 1, 0, 0, 1 });
             PolynomialFieldRepresentation field2 = new PolynomialFieldRepresentation(3, 2);
 
-            PolynomialModular polynomial1 = new PolynomialModular(field1, new BigInteger[] { 0, 0, 0, 0, 0, 0, 1 });
-            PolynomialModular polynomial2 = new PolynomialModular(field1, new BigInteger[] { 1, 1, 0, 1 });
-            PolynomialModular polynomial3 = new PolynomialModular(field1, new BigInteger[] { 1, 1, 0, 1, 1, 0, 0, 0, 0, 1 });
-            PolynomialModular polynomial4 = new PolynomialModular(field1, new BigInteger[] { 1, 1, 1 });
-            PolynomialModular polynomial5 = new PolynomialModular(field2, new BigInteger[] { 1, 0, 1, 2 }); //3
-            PolynomialModular polynomial6 = new PolynomialModular(field2, new BigInteger[] { 1, 2, 2 });    //3
+            Polynomial polynomial1 = new Polynomial(field1, new BigInteger[] { 0, 0, 0, 0, 0, 0, 1 });
+            Polynomial polynomial2 = new Polynomial(field1, new BigInteger[] { 1, 1, 0, 1 });
+            Polynomial polynomial3 = new Polynomial(field1, new BigInteger[] { 1, 1, 0, 1, 1, 0, 0, 0, 0, 1 });
+            Polynomial polynomial4 = new Polynomial(field1, new BigInteger[] { 1, 1, 1 });
+            Polynomial polynomial5 = new Polynomial(field2, new BigInteger[] { 1, 0, 1, 2 }); //3
+            Polynomial polynomial6 = new Polynomial(field2, new BigInteger[] { 1, 2, 2 });    //3
 
-            var irreducibles1 = PolynomialModular.FindMinimalPolynomials(2, 4);
+            var minimalPolynomials1 = Polynomial.FindMinimalPolynomials(2, 4);
 
-            var irreduciblePolynomials1 = PolynomialModular.FindIrreduciblePolynomials(field1);
+            //var irreduciblePolynomials1 = PolynomialModular.FindIrreduciblePolynomials(field1);
 
             var division1 = polynomial1 % polynomial2;
             var division2 = polynomial3 % polynomial4;
             var division3 = polynomial5 % polynomial6;
-
-            int power1 = 6;
 
             Console.WriteLine("{0} % {1} = {2}", polynomial1, polynomial2, division1);
             Console.WriteLine("{0} % {1} = {2}", polynomial3, polynomial4, division2);
             Console.WriteLine("{0} % {1} = {2}", polynomial5, polynomial6, division3);
 
             
-            for (int i = 0; i < irreducibles1.Count; i++)
+            for (int i = 0; i < minimalPolynomials1.Count; i++)
             {
-                Console.WriteLine("Warstwa cyklotomiczna numer {0}:", irreducibles1[i][0]);
-                for (int j = 0; j < irreducibles1[i].Count; j++)
-                    Console.Write("{0}" + ((j == (irreducibles1[i].Count - 1)) ? "\n" : ", "), irreducibles1[i][j]);
+                Console.WriteLine("Warstwa cyklotomiczna numer {0}:", minimalPolynomials1[i][0]);
+                for (int j = 0; j < minimalPolynomials1[i].Count; j++)
+                    Console.Write("{0}" + ((j == (minimalPolynomials1[i].Count - 1)) ? "\n" : ", "), minimalPolynomials1[i][j]);
             }
 
             Console.WriteLine("Elementy ciała {0}:", field1);
             for (int i = 0; i < (int)Math.Pow((int)field1.Characteristic, field1.Dimension) - 1; i++)
-                Console.WriteLine("\ta^{0}:\t{1}", i, new PolynomialModular(field1, power: i));
-
-            Console.WriteLine("Wielomiany nierozkładalne nad {0}:", field1);
-            for (int i = 0; i < irreduciblePolynomials1.Count; i++)
-                Console.WriteLine("\t{0}", irreduciblePolynomials1[i]);
+                Console.WriteLine("\ta^{0}:\t{1}", i, new Polynomial(field1, power: i));
 
             //Console.WriteLine("Algorytm Euklidesa dla wielomianów.");
             //Console.WriteLine(PolynomialModular.Euclids(polynomial3, polynomial1));
+
+            var polynomialValueForArgument1 = polynomial2.CalculateForArgument(f);
+
+            Console.WriteLine("Wartość wielomianu {0} dla argumentu {1}:\t{2}", polynomial2, f, polynomialValueForArgument1);
+            Console.WriteLine("Powyższy wielomian jest nierozkładalny:\t{0}", polynomialValueForArgument1.IsPrime() ? "NIE" : "TAK");
+
+            var irreducibles1 = Polynomial.FindIrreduciblePolynomials(field1);
+
+            Console.WriteLine("Wielomiany nierozkładalne stopnia {0} nad ciałem GF({1}):", field1.Dimension, field1.Characteristic);
+            foreach (var irreducible in irreducibles1)
+                Console.WriteLine("\t{0}", irreducible);
 
             Console.ReadKey();
         }
