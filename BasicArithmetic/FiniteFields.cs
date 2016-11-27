@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Combinatorics.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -7,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace BasicArithmetic
 {
-    class FiniteField
+    public class FiniteField
     {
         public BigInteger Characteristic { get; set; }
     }
 
-    class ExtendedFiniteField : FiniteField
+    public class ExtendedFiniteField : FiniteField
     {
         public int Dimension { get; set; }
     }
 
-    class PolynomialFieldRepresentation : ExtendedFiniteField
+    public class PolynomialFieldRepresentation : ExtendedFiniteField
     {
         public Polynomial Generator { get; set; }
 
@@ -32,6 +33,31 @@ namespace BasicArithmetic
             Characteristic = characteristic;
             Dimension = dimension;
             Generator = new Polynomial(this, generator);
+        }
+
+        public PolynomialFieldRepresentation(BigInteger characteristic, int dimension, Polynomial generator)
+        {
+            Characteristic = characteristic;
+            Dimension = dimension;
+            Generator = generator;
+        }
+
+        public List<Polynomial> FindIrreduciblePolynomials()
+        {
+            List<Polynomial> result = new List<Polynomial>();
+            var elements = Modular.GetAllElements(this.Characteristic);
+            var variations = new Variations<BigInteger>(elements, this.Dimension + 1, GenerateOption.WithRepetition);
+
+            foreach (var variation in variations)
+            {
+                if (variation[this.Dimension] == 0)
+                    continue;
+                Polynomial polynomial = new Polynomial(this, variation.ToArray());
+                if (polynomial.CalculateForArgument(new Modular(this.Characteristic, this.Characteristic, false)).IsPrime())
+                    result.Add(polynomial);
+            }
+
+            return result;
         }
 
         public static bool operator ==(PolynomialFieldRepresentation field1, PolynomialFieldRepresentation field2)

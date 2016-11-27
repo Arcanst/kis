@@ -90,6 +90,7 @@ namespace BasicArithmetic
             Console.WriteLine("------------------ POLYNOMIALS ------------------");
             PolynomialFieldRepresentation field1 = new PolynomialFieldRepresentation(2, 4, new BigInteger[] { 1, 1, 0, 0, 1 });
             PolynomialFieldRepresentation field2 = new PolynomialFieldRepresentation(3, 2);
+            PolynomialFieldRepresentation field3 = new PolynomialFieldRepresentation(2, 3, new BigInteger[] { 1, 0, 0, 1 });
 
             Polynomial polynomial1 = new Polynomial(field1, new BigInteger[] { 0, 0, 0, 0, 0, 0, 1 });
             Polynomial polynomial2 = new Polynomial(field1, new BigInteger[] { 1, 1, 0, 1 });
@@ -97,6 +98,8 @@ namespace BasicArithmetic
             Polynomial polynomial4 = new Polynomial(field1, new BigInteger[] { 1, 1, 1 });
             Polynomial polynomial5 = new Polynomial(field2, new BigInteger[] { 1, 0, 1, 2 }); //3
             Polynomial polynomial6 = new Polynomial(field2, new BigInteger[] { 1, 2, 2 });    //3
+            Polynomial polynomial7 = new Polynomial(field3, new BigInteger[] { 1, 0, 1 });
+            Polynomial polynomial8 = new Polynomial(field3, new BigInteger[] { 0, 1, 0 });
 
             var minimalPolynomials1 = Polynomial.FindMinimalPolynomials(2, 4);
 
@@ -105,12 +108,14 @@ namespace BasicArithmetic
             var division1 = polynomial1 % polynomial2;
             var division2 = polynomial3 % polynomial4;
             var division3 = polynomial5 % polynomial6;
+            var division4 = polynomial7 % polynomial8;
 
             Console.WriteLine("{0} % {1} = {2}", polynomial1, polynomial2, division1);
             Console.WriteLine("{0} % {1} = {2}", polynomial3, polynomial4, division2);
             Console.WriteLine("{0} % {1} = {2}", polynomial5, polynomial6, division3);
+            Console.WriteLine("{0} % {1} = {2}", polynomial7, polynomial8, division4);
 
-            
+
             for (int i = 0; i < minimalPolynomials1.Count; i++)
             {
                 Console.WriteLine("Warstwa cyklotomiczna numer {0}:", minimalPolynomials1[i][0]);
@@ -122,18 +127,28 @@ namespace BasicArithmetic
             for (int i = 0; i < (int)Math.Pow((int)field1.Characteristic, field1.Dimension) - 1; i++)
                 Console.WriteLine("\ta^{0}:\t{1}", i, new Polynomial(field1, power: i));
 
-            //Console.WriteLine("Algorytm Euklidesa dla wielomianów.");
-            //Console.WriteLine(PolynomialModular.Euclids(polynomial3, polynomial1));
+            Console.WriteLine("Algorytm Euklidesa dla wielomianów {0} i {1}.", polynomial3, polynomial3);
+            Console.WriteLine(Polynomial.Euclids(polynomial3, polynomial3));
 
             var polynomialValueForArgument1 = polynomial2.CalculateForArgument(f);
 
             Console.WriteLine("Wartość wielomianu {0} dla argumentu {1}:\t{2}", polynomial2, f, polynomialValueForArgument1);
             Console.WriteLine("Powyższy wielomian jest nierozkładalny:\t{0}", polynomialValueForArgument1.IsPrime() ? "NIE" : "TAK");
 
-            var irreducibles1 = Polynomial.FindIrreduciblePolynomials(field1);
+            var irreducibles1 = field1.FindIrreduciblePolynomials();
+            var irreducibles2 = field3.FindIrreduciblePolynomials();
+            var irreducibles3 = field2.FindIrreduciblePolynomials();
 
             Console.WriteLine("Wielomiany nierozkładalne stopnia {0} nad ciałem GF({1}):", field1.Dimension, field1.Characteristic);
             foreach (var irreducible in irreducibles1)
+                Console.WriteLine("\t{0}", irreducible);
+
+            Console.WriteLine("Wielomiany nierozkładalne stopnia {0} nad ciałem GF({1}):", field3.Dimension, field3.Characteristic);
+            foreach (var irreducible in irreducibles2)
+                Console.WriteLine("\t{0}", irreducible);
+
+            Console.WriteLine("Wielomiany nierozkładalne stopnia {0} nad ciałem GF({1}):", field2.Dimension, field2.Characteristic);
+            foreach (var irreducible in irreducibles3)
                 Console.WriteLine("\t{0}", irreducible);
 
             Console.ReadKey();

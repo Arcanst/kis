@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace BasicArithmetic
 {
-    class Polynomial : ExtendedModular
+    public class Polynomial : ExtendedModular
     {
-        private Modular[] Coefficients { get; set; }
+        public Modular[] Coefficients { get; set; }
 
         #region constructors and initializers
         public Polynomial(PolynomialFieldRepresentation field, int length = 0)
@@ -41,12 +41,21 @@ namespace BasicArithmetic
         }
 
         public Polynomial(PolynomialFieldRepresentation field, BigInteger[] coefficients)
-            :base(field)
+            : base(field)
         {
-            Coefficients = new Modular[coefficients.Length];
+            this.Coefficients = new Modular[coefficients.Length];
 
             for (int i = 0; i < coefficients.Length; i++)
                 Coefficients[i] = new Modular(coefficients[i], Field.Characteristic);
+        }
+
+        public Polynomial(PolynomialFieldRepresentation field, Polynomial polynomial)
+            : base(field)
+        {
+            this.Coefficients = new Modular[polynomial.Coefficients.Length];
+
+            for (int i = 0; i < polynomial.Coefficients.Length; i++)
+                Coefficients[i] = new Modular(polynomial.Coefficients[i].Value, Field.Characteristic);
         }
 
         public Polynomial(Polynomial polynomial)
@@ -139,28 +148,54 @@ namespace BasicArithmetic
 
         public static Polynomial operator %(Polynomial a, Polynomial b)
         {
-            int degree = Degree(a);
-            int divisorDegree = Degree(b);
+            int degree = a.Degree();
+            int divisorDegree = b.Degree();
             if (degree < divisorDegree)
                 return new Polynomial(a);
 
             Polynomial result = new Polynomial((PolynomialFieldRepresentation)a.Field, length: degree - divisorDegree + 1);
             Polynomial rest = new Polynomial(a);
 
-            while (Degree(rest) >= divisorDegree)
+            while (rest.Degree() >= divisorDegree)
+            {
+                Polynomial temp = new Polynomial((PolynomialFieldRepresentation)a.Field, length: degree + 2);
+                int elementDegree = degree - divisorDegree;
+                result[elementDegree] = rest[degree] * b[divisorDegree].MultiplicativeInversion();
+
+                for (int i = 0; i < b.Degree() + 1; i++)
+                    temp[elementDegree + i] = result[elementDegree] * b[i];
+
+                rest = rest - temp;
+                degree = rest.Degree();
+            }
+
+            return rest;
+        }
+
+        public static Tuple<Polynomial, Polynomial> operator /(Polynomial a, Polynomial b)
+        {
+            int degree = a.Degree();
+            int divisorDegree = b.Degree();
+            if (degree < divisorDegree)
+                return new Tuple<Polynomial, Polynomial>(new Polynomial(a), null);
+
+            Polynomial result = new Polynomial((PolynomialFieldRepresentation)a.Field, length: degree - divisorDegree + 2);
+            Polynomial rest = new Polynomial(a);
+
+            while (rest.Degree() >= divisorDegree)
             {
                 Polynomial temp = new Polynomial((PolynomialFieldRepresentation)a.Field, length: degree + 1);
                 int elementDegree = degree - divisorDegree;
                 result[elementDegree] = rest[degree] * b[divisorDegree].MultiplicativeInversion();
 
-                for (int i = 0; i < b.Coefficients.Length; i++)
+                for (int i = 0; i < b.Degree() + 1; i++)
                     temp[elementDegree + i] = result[elementDegree] * b[i];
 
                 rest = rest - temp;
-                degree = Degree(rest);
+                degree = rest.Degree();
             }
 
-            return rest;
+            return new Tuple<Polynomial, Polynomial>(result, rest);
         }
 
         public static bool operator ==(Polynomial a, Polynomial b)
@@ -207,12 +242,12 @@ namespace BasicArithmetic
 
         public static bool operator >(Polynomial a, Polynomial b)
         {
-            return Degree(a) > Degree(b);
+            return a.Degree() > b.Degree();
         }
 
         public static bool operator <(Polynomial a, Polynomial b)
         {
-            return Degree(a) < Degree(b);
+            return a.Degree() < b.Degree();
         }
 
         public Modular this[int key]
@@ -247,60 +282,16 @@ namespace BasicArithmetic
             return result;
         }
 
-        #region static
-        private static int Degree(Polynomial polynomial)
+        public int Degree()
         {
-            for (int i = polynomial.Coefficients.Count() - 1; i >= 0; i--)
-                if (polynomial[i] != 0)
+            for (int i = this.Coefficients.Count() - 1; i >= 0; i--)
+                if (this[i] != 0)
                     return i;
 
             return -1;
         }
 
-        public static List<Polynomial> FindIrreduciblePolynomials2(PolynomialFieldRepresentation field)
-        {
-            List<Polynomial> result = new List<Polynomial>();
-            var one = new Polynomial(field, power: 1);
-
-            var minimalPolynomials = Polynomial.FindMinimalPolynomials(field.Characteristic, field.Dimension);
-
-            foreach (var minimalPolynomial in minimalPolynomials)
-            {
-                List<Polynomial> elements = new List<Polynomial>();
-                foreach (var element in minimalPolynomial)
-                    elements.Add(new Polynomial(field, power: (int)element));
-
-                Polynomial irreduciblePolynomial = elements[0] - one;
-                for (int i = 1; i < elements.Count; i++)
-                {
-                    var par = elements[i] - one;
-                    irreduciblePolynomial *= par;
-                }
-
-                result.Add(irreduciblePolynomial);
-            }
-
-            return result;
-        }
-
-        public static List<Polynomial> FindIrreduciblePolynomials(PolynomialFieldRepresentation field)
-        {
-            List<Polynomial> result = new List<Polynomial>();
-            var elements = Modular.GetAllElements(field.Characteristic);
-            var variations = new Variations<BigInteger>(elements, field.Dimension + 1, GenerateOption.WithRepetition);
-
-            foreach (var variation in variations)
-            {
-                if (variation[field.Dimension] == 0)
-                    continue;
-                Polynomial polynomial = new Polynomial(field, variation.ToArray());
-                if (polynomial.CalculateForArgument(new Modular(field.Characteristic, field.Characteristic, false)).IsPrime())
-                    result.Add(polynomial);
-            }
-
-            return result;
-        }
-
+        #region static
         public static List<List<BigInteger>> FindMinimalPolynomials(BigInteger characteristic, int extension)
         {
             List<List<BigInteger>> result = new List<List<BigInteger>>();

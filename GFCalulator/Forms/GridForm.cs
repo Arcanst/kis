@@ -23,14 +23,14 @@ namespace GFCalulator.Forms
 
             for (int i = 0; i < Characteristic; i++)
             {
-                dataGridView.Columns.Add(i.ToString(), "");
-                var column = dataGridView.Columns[i];
-                column.SortMode = DataGridViewColumnSortMode.NotSortable;
+                dataGridView.Columns.Add(i.ToString(), i.ToString());
+                dataGridView.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
             }
 
             for (int i = 0; i < Characteristic; i++)
             {
                 dataGridView.Rows.Add();
+                dataGridView.Rows[i].HeaderCell.Value = i.ToString();
 
                 for (int j = 0; j < Characteristic; j++)
                     dataGridView.Rows[i].Cells[j].Value = table[i, j];

@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace BasicArithmetic
 {
-    class ExtendedModular
+    public class ExtendedModular
     {
         public ExtendedFiniteField Field { get; set; }
         public int Power { get; set; }
