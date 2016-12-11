@@ -68,6 +68,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.textBoxAddSum = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.findIrreduciblesBtn = new System.Windows.Forms.Button();
             this.addGeneratorBtn = new System.Windows.Forms.Button();
             this.calculatePolynomialsBtn = new System.Windows.Forms.Button();
             this.labelExtendedFieldSpecifier = new System.Windows.Forms.Label();
@@ -100,7 +101,6 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.listBox1 = new System.Windows.Forms.ListBox();
-            this.findIrreduciblesBtn = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.panel5.SuspendLayout();
@@ -496,6 +496,16 @@
             this.tabPage2.Text = "Wielomiany";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // findIrreduciblesBtn
+            // 
+            this.findIrreduciblesBtn.Location = new System.Drawing.Point(310, 281);
+            this.findIrreduciblesBtn.Name = "findIrreduciblesBtn";
+            this.findIrreduciblesBtn.Size = new System.Drawing.Size(193, 23);
+            this.findIrreduciblesBtn.TabIndex = 32;
+            this.findIrreduciblesBtn.Text = "Znajdź wielomiany nierozkładalne";
+            this.findIrreduciblesBtn.UseVisualStyleBackColor = true;
+            this.findIrreduciblesBtn.Click += new System.EventHandler(this.findIrreduciblesBtn_Click);
+            // 
             // addGeneratorBtn
             // 
             this.addGeneratorBtn.Location = new System.Drawing.Point(300, 32);
@@ -761,16 +771,6 @@
             this.listBox1.TabIndex = 0;
             this.listBox1.ValueMember = "Key";
             this.listBox1.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
-            // 
-            // findIrreduciblesBtn
-            // 
-            this.findIrreduciblesBtn.Location = new System.Drawing.Point(310, 281);
-            this.findIrreduciblesBtn.Name = "findIrreduciblesBtn";
-            this.findIrreduciblesBtn.Size = new System.Drawing.Size(193, 23);
-            this.findIrreduciblesBtn.TabIndex = 32;
-            this.findIrreduciblesBtn.Text = "Znajdź wielomiany nierozkładalne";
-            this.findIrreduciblesBtn.UseVisualStyleBackColor = true;
-            this.findIrreduciblesBtn.Click += new System.EventHandler(this.findIrreduciblesBtn_Click);
             // 
             // Form1
             // 

@@ -11,6 +11,75 @@ namespace BasicArithmetic
     {
         static void Main(string[] args)
         {
+            showIrreducibles();
+        }
+
+        public static void showIrreducibles()
+        {
+            PolynomialFieldRepresentation field1 = new PolynomialFieldRepresentation(2, 5);
+            var irreducibles1 = field1.FindIrreduciblePolynomials();
+            Console.WriteLine("Wielomiany nierozkładalne stopnia {0} nad ciałem GF({1}):", field1.Dimension, field1.Characteristic);
+            foreach (var irreducible in irreducibles1)
+                Console.WriteLine("\t{0}", irreducible);
+
+            Console.ReadKey();
+        }
+
+        public static void showSomeMinimals()
+        {
+            var polynomials2 = Polynomial.FindMinimalPolynomials(2, 2);
+            var polynomials3 = Polynomial.FindMinimalPolynomials(2, 3);
+            var polynomials4 = Polynomial.FindMinimalPolynomials(2, 4);
+            var polynomials5 = Polynomial.FindMinimalPolynomials(2, 5);
+
+            Console.WriteLine("Ciało GF({0}^{1}):", 2, 2);
+            int i = 0;
+            foreach (var polynomial in polynomials2)
+            {
+                Console.WriteLine("Warstwa cyklotomiczna numer {0}:", polynomial[0]);
+                for (int j = 0; j < polynomial.Count; j++)
+                    Console.Write("{0}" + ((j == (polynomial.Count - 1)) ? "\n" : ", "), polynomial[j]);
+                i++;
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Ciało GF({0}^{1}):", 2, 3);
+            i = 0;
+            foreach (var polynomial in polynomials3)
+            {
+                Console.WriteLine("Warstwa cyklotomiczna numer {0}:", polynomial[0]);
+                for (int j = 0; j < polynomial.Count; j++)
+                    Console.Write("{0}" + ((j == (polynomial.Count - 1)) ? "\n" : ", "), polynomial[j]);
+                i++;
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Ciało GF({0}^{1}):", 2, 4);
+            i = 0;
+            foreach (var polynomial in polynomials4)
+            {
+                Console.WriteLine("Warstwa cyklotomiczna numer {0}:", polynomial[0]);
+                for (int j = 0; j < polynomial.Count; j++)
+                    Console.Write("{0}" + ((j == (polynomial.Count - 1)) ? "\n" : ", "), polynomial[j]);
+                i++;
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Ciało GF({0}^{1}):", 2, 5);
+            i = 0;
+            foreach (var polynomial in polynomials5)
+            {
+                Console.WriteLine("Warstwa cyklotomiczna numer {0}:", polynomial[0]);
+                for (int j = 0; j < polynomial.Count; j++)
+                    Console.Write("{0}" + ((j == (polynomial.Count - 1)) ? "\n" : ", "), polynomial[j]);
+                i++;
+            }
+
+            Console.ReadKey();
+        }
+
+        public static void showAllTests()
+        {
             Console.WriteLine("Największa dostępna liczba typu decimal: {0}", decimal.MaxValue);
 
             // http://ptrow.com/perl/calculator.pl check for correct answers
@@ -71,7 +140,7 @@ namespace BasicArithmetic
             for (int i = 0; i < maxModulus; i++)
             {
                 var eulersFunction = Modular.EulersFunction(i);
-                Console.WriteLine("\tdla n={0}: {1}, jest pierwsza: {2}", i, eulersFunction, eulersFunction == i -1 ? "TAK" : "NIE");
+                Console.WriteLine("\tdla n={0}: {1}, jest pierwsza: {2}", i, eulersFunction, eulersFunction == i - 1 ? "TAK" : "NIE");
             }
 
             Console.WriteLine("Elementy prymitywne w ciele GF({0}):", number2);
